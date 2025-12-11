@@ -21,9 +21,11 @@ export const getPosts = async () => {
  * 게시글 상세 정보 조회// detail
  * @param {number|string} postId
  */
-export const getPostDetail = async (postId) => {
+export const getPostDetail = async (postId, userId) => {
     try {
-        const response = await api.get(`/community/post/${postId}`);
+        const response = await api.get(`/community/post/${postId}`, {
+            params: {userId: userId}
+        });
         return response.data;
     } catch (error) {
         console.error(`[CommunityApi] 상세 조회 실패 (ID: ${postId}):`, error);

@@ -57,11 +57,17 @@ export default function BoardDetailScreen({ navigation, route }) {
         useCallback(() => {
         const fetchPostDetail = async ()=> {
             try {
-                const data = await getPostDetail(initialPost.id);
+
+                const storedUserId = await AsyncStorage.getItem('userId');
+
+                if (storedUserId) setMyId(storedUserId); //State 저장
+
+                //서버에 id를 같이 보내서 상세 정보 조회
+                const data = await getPostDetail(initialPost.id, storedUserId);
                 console.log('상세 데이터:', JSON.stringify(data, null, 2));
                 setPostDetail(data);
 
-                setIsLiked(data.like? true : false);
+                setIsLiked(data.liked > 0|| data.liked === true);
                 setLikeCount(data.communityLikeCount || 0);
 
             } catch (error) {
