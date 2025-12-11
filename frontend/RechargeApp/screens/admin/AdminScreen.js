@@ -4,7 +4,9 @@ import ReportPostsScreen from "./ReportPostsScreen";
 import ReportCommentsScreen from "./ReportCommentsScreen";
 import NoticeStack from "../../components/layout/notice/NoticeStack";
 
-export default function AdminScreen() {
+export default function AdminScreen({ route }) {
+    const user = route?.params?.user; // 로그인한 관리자 정보
+
     const [mainTab, setMainTab] = useState("report"); // "report" or "notice"
     const [reportSubTab, setReportSubTab] = useState("post"); // "post" or "comment"
 
@@ -47,8 +49,8 @@ export default function AdminScreen() {
                     </View>
 
                     {/* 신고자 관리 화면 */}
-                    {reportSubTab === "post" && <ReportPostsScreen />}
-                    {reportSubTab === "comment" && <ReportCommentsScreen />}
+                    {reportSubTab === "post" && <ReportPostsScreen user={user} />}
+                    {reportSubTab === "comment" && <ReportCommentsScreen user={user} />}
                 </View>
             )}
         </View>
