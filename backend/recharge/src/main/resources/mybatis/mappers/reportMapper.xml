@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.recharge.report.dao.ReportDAO">
+
+    <!-- 신고 등록 -->
+    <insert id="insertReport" parameterType="com.recharge.report.vo.ReportVO">
+        INSERT INTO TB_REPORT (
+        REPORT_ID,
+        REPORT_TARGET_TYPE,
+        REPORT_TARGET_ID,
+        USER_ID,
+        REPORT_REASON,
+        REPORT_DATE,
+        REPORT_STATUS,
+        CREATE_DATE,
+        CREATE_ID,
+        UPDATED_DATE,
+        UPDATED_ID,
+        REPORT_TARGET_USER_ID
+        ) VALUES (
+        #{reportId},
+        #{reportTargetType},
+        #{reportTargetId},
+        #{userId},
+        #{reportReason},
+        SYSDATE,
+        'PENDING',
+        SYSDATE,
+        #{createId},
+        SYSDATE,
+        #{updatedId},
+        #{reportTargetUserId}
+        )
+    </insert>
+
+    <!-- 유저가 이미 같은 게시물을 신고했는지 체크 (1회만 신고 가능) -->
+    <select id="isReported" parameterType="map" resultType="int">
+        SELECT COUNT(1)
+        FROM TB_REPORT
+        WHERE REPORT_TARGET_TYPE = #{targetType}
+        AND REPORT_TARGET_ID = #{targetId}
+        AND USER_ID = #{userId}
+    </select>
+
+    <!-- 특정 대상 신고 내역 -->
+    <select id="getReportsByTarget" parameterType="map"
+            resultType="com.recharge.report.vo.ReportVO">
+        SELECT
+        REPORT_ID AS reportId,
+        REPORT_TARGET_TYPE AS reportTargetType,
+        REPORT_TARGET_ID AS reportTargetId,
+        USER_ID AS userId,
+        REPORT_REASON AS reportReason,
+        REPORT_DATE AS reportDate,
+        REPORT_STATUS AS reportStatus,
+        CREATE_DATE AS createDate,
+        CREATE_ID AS createId,
+        UPDATED_DATE AS updatedDate,
+        UPDATED_ID AS updatedId,
+        REPORT_TARGET_USER_ID AS reportTargetUserId
+        FROM TB_REPORT
+        WHERE REPORT_TARGET_TYPE = #{targetType}
+        AND REPORT_TARGET_ID = #{targetId}
+        ORDER BY REPORT_DATE DESC
+    </select>
+
+    <!-- 현재 신고 ID 최댓값 -->
+    <select id="getMaxReportId" resultType="int">
+        SELECT NVL(MAX(REPORT_ID), 0)
+        FROM TB_REPORT
+    </select>
+
+    <!-- 전체 신고 목록 -->
+    <select id="getAllReports" resultType="com.recharge.report.vo.ReportVO">
+        SELECT
+        REPORT_ID AS reportId,
+        REPORT_TARGET_TYPE AS reportTargetType,
+        REPORT_TARGET_ID AS reportTargetId,
+        USER_ID AS userId,
+        REPORT_REASON AS reportReason,
+        REPORT_DATE AS reportDate,
+        REPORT_STATUS AS reportStatus,
+        CREATE_DATE AS createDate,
+        CREATE_ID AS createId,
+        UPDATED_DATE AS updatedDate,
+        UPDATED_ID AS updatedId,
+        REPORT_TARGET_USER_ID AS reportTargetUserId
+        FROM TB_REPORT
+        ORDER BY REPORT_DATE DESC
+    </select>
+
+    <!-- 신고 상태 업데이트 -->
+    <update id="updateReportStatus" parameterType="com.recharge.report.vo.ReportVO">
+        UPDATE TB_REPORT
+        SET
+        REPORT_STATUS = #{reportStatus},
+        UPDATED_DATE = SYSDATE,
+        UPDATED_ID = #{updatedId}
+        WHERE REPORT_ID = #{reportId}
+    </update>
+
+</mapper>
