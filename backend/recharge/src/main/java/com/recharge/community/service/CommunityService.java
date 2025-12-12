@@ -25,10 +25,10 @@ public class CommunityService {
         return communityDAO.selectPostList();
     }
     //상세 조회 서비스
-    public CommunityVO readPost(int postId) {
+    public CommunityVO readPost(int postId, String userId) {
         communityDAO.updateViewCount(postId);
 
-        return communityDAO.selectPostDetail(postId);
+        return communityDAO.selectPostDetail(postId, userId);
     }
     public void deletePost(int postId) {
         communityDAO.deletePost(postId);

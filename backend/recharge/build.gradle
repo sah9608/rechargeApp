@@ -60,6 +60,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 	implementation 'org.json:json:20240303'
+
+	implementation 'com.google.auth:google-auth-library-oauth2-http:1.23.0'
 }
 
 tasks.named('test') {

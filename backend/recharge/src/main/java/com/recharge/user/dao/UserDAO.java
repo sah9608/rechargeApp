@@ -34,4 +34,8 @@ public interface UserDAO {
     int verifyUserEmail(UserVO user);
 
     int updateUserAfterEmailVerified(UserVO user);
+
+    int updateUserInfo(UserVO user);
+
+    int updateProfileUserPassword(UserVO user);
 }

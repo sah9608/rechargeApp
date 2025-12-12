@@ -274,10 +274,16 @@ export default function ChargerMainScreen({navigation}) {
 
   /** ---------------- 검색 ---------------- */
 
-  const handleSearch = async () => {
-    if (!searchText.trim()) return;
+ const handleSearch = async () => {
+    if (!searchText.trim()) {
+      setAutoVisible(false); // 빈 문자열일 때도 닫아주기
+      return;
+    }
 
     Keyboard.dismiss();
+
+    // 자동완성 모달 닫기
+    setAutoVisible(false);
 
     const result = await searchStation(searchText);
     if (!result) return;
@@ -293,9 +299,7 @@ export default function ChargerMainScreen({navigation}) {
       }),
     );
 
-    // station 상태만 세팅 → 핀은 useEffect에서 처리
     setStation(stations);
-
     setSearchText('');
   };
 

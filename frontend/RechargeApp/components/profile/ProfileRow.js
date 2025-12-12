@@ -1,13 +1,17 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, Pressable, StyleSheet} from 'react-native';
 
 export default function ProfileRow({label, value, editable = false, onSave}) {
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
   const handleSave = () => {
     onSave(inputValue);
-    setEditing(false);
+    setEditing(false); //수정모드 종료
   };
 
   return (
@@ -34,6 +38,7 @@ export default function ProfileRow({label, value, editable = false, onSave}) {
             style={styles.input}
             value={inputValue}
             onChangeText={setInputValue}
+            autoFocus={true} //수정 모드 진입 시 자동포터스
           />
           <Pressable
             onPress={handleSave}

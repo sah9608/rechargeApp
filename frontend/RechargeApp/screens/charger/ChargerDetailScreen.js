@@ -350,7 +350,7 @@ export default function ChargerDetailScreen({route}) {
         contentContainerStyle={{paddingBottom: 80}}>
         <View style={styles.cardList}>
           {places.length === 0 ? (
-            <Text style={{color: '#666'}}>주변 데이터 없어요 😢</Text>
+            <LoadingAnimation size={300} />
           ) : (
             filteredPlaces.map((p, idx) => (
               <PlaceItem

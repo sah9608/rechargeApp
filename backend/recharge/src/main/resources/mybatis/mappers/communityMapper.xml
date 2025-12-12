@@ -86,7 +86,7 @@
         WHERE COMMUNITY_POST_ID = #{postId}
     </update>
 
-    <select id="selectPostDetail" parameterType="int" resultType="com.recharge.community.vo.CommunityVO">
+    <select id="selectPostDetail" resultType="com.recharge.community.vo.CommunityVO">
         SELECT
             C.COMMUNITY_POST_ID AS communityPostId,
             C.COMMUNITY_TITLE AS communityTitle,
@@ -101,7 +101,12 @@
             U.USER_NICKNAME AS userNickname,
         CASE WHEN C.COMMUNITY_IMAGE_DATA IS NOT NULL THEN 'Y'
         ELSE 'N'
-        END AS hasImage
+        END AS hasImage,
+        (SELECT COUNT(*)
+            FROM TB_COMMUNITY_LIKE L
+            WHERE L.COMMUNITY_POST_ID = C.COMMUNITY_POST_ID
+            AND L.USER_ID = #{userId}) as liked
+
         FROM TB_COMMUNITY C
         LEFT JOIN TB_USER U ON C.USER_ID = U.USER_ID
         LEFT JOIN TB_COMMON_CATEGORY CC

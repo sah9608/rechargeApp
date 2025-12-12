@@ -9,10 +9,10 @@ export const API_BASE_URL =
     ?'http://192.168.2.15:18090/api'
     : 'http://192.168.2.15:18090/api';
 
-    //  'http://10.0.2.2:18090/api'
-    //: 'http://10.0.2.2:18090/api';
+    //  ?'http://10.0.2.2:18090/api'
+   // : 'http://10.0.2.2:18090/api';
 
-// 'http://192.168.0.210:18090/api'
+//? 'http://192.168.0.210:18090/api'
 //: 'http://192.168.0.210:18090/api';
 
 const api = axios.create({
@@ -170,4 +170,37 @@ export const verifyEmail = async (email, authCode) => {
   }
 };
 
+//회원 정보 조회
+export const getUserInfo = async (userId) => {
+  try {
+    const res = await api.get('/user/getUser', {params: {userId}});
+    return res.data;
+  } catch (err) {
+    console.error('회원 정보 조회 실패:', err);
+    throw err;
+  }
+};
+
+//회원 정보 수정
+export const updateUserInfo = async (userData) => {
+  try{
+    const res =await api.post('/user/modify', userData);
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || '수정 실패';
+  }
+};
+
+//profilepw
+export const profileResetPassword = async resetData => {
+  try {
+    console.log('비밀번호 재설정 요청 : ', resetData);
+    const res = await api.post('/user/profile-pw', resetData);
+    console.log('비밀번호 재설정 응답:', res.data);
+    return res.data;
+  } catch (err) {
+    console.log('비밀번호 재설정 실패', err.response?.data || err);
+    throw err.response?.data || '비밀번호 재설정 실패';
+  }
+};
 export default api;

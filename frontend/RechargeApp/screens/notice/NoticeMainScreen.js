@@ -67,7 +67,7 @@ export default function NoticeMainScreen({ navigation, route }) {
         return <ActivityIndicator size="large" style={{ flex: 1 }} />;
     }
 
-    return (
+  return (
         <View style={styles.container}>
             {/* 상단 헤더 */}
             <View style={styles.header}>
@@ -76,21 +76,22 @@ export default function NoticeMainScreen({ navigation, route }) {
                     <Text style={styles.headerTitle}>공지사항</Text>
                 </View>
 
-                {/* {isAdmin && (    들어가야함 */}
-                <Button
-                    type="add"
-                    text="+  글쓰기"
-                    width={80}
-                    height={34}
-                    textStyle={{ fontSize: 13, fontWeight: '600' }}
-                    onPress={() => navigation.navigate('NoticeWrite', {
-                        noticeList,
-                        mode: "create",
-                        isAdmin: true,
-                        user,  // user 추가
-                    })
-                    }
-                />
+               
+                {user?.role === "ADMIN" && (
+                    <Button
+                        type="add"
+                        text="+  글쓰기"
+                        width={80}
+                        height={34}
+                        textStyle={{ fontSize: 13, fontWeight: '600' }}
+                        onPress={() => navigation.navigate('NoticeWrite', {
+                            noticeList,
+                            mode: "create",
+                            isAdmin: true,
+                            user,
+                        })}
+                    />
+                )}
             </View>
             <FlatList
                 data={noticeList}

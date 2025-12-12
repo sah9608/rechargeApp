@@ -4,6 +4,7 @@ import com.recharge.config.JwtTokenProvider;
 import com.recharge.user.dao.UserDAO;
 import com.recharge.user.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private EmailService emailService;
 
-    /** 회원가입 */
+    /**
+     * 회원가입
+     */
     @Override
     public int insertUser(UserVO user) {
 
@@ -58,7 +61,9 @@ public class UserServiceImpl implements UserService {
         return userDAO.checkUserNickName(userNickname) > 0;
     }
 
-    /** 로그인 */
+    /**
+     * 로그인
+     */
     @Override
     public UserVO login(UserVO user) {
         UserVO dbUser = userDAO.getUserById(user.getUserId());
@@ -148,7 +153,9 @@ public class UserServiceImpl implements UserService {
         return userDAO.checkUserEmail(userEmail) > 0;
     }
 
-    /** 이메일 인증 코드 발송 */
+    /**
+     * 이메일 인증 코드 발송
+     */
     @Override
     public boolean sendEmailAuthentication(UserVO user) {
 
@@ -188,4 +195,33 @@ public class UserServiceImpl implements UserService {
 
         return userDAO.verifyUserEmail(dbUser) > 0;
     }
+
+    //회원정보 조회
+    @Override
+    public UserVO getUserById(String userId) {
+        return userDAO.getUserById(userId);
+    }
+
+    //회원정보 수정
+    @Override
+    public boolean updateUserInfo(UserVO user) {
+        if (user.getUserNickname() != null) {
+            UserVO dbUser = userDAO.getUserById(user.getUserId());
+
+            if (!dbUser.getUserNickname().equals(user.getUserNickname())) {
+                if (userDAO.checkUserNickName(user.getUserNickname()) > 0) {
+                    throw new RuntimeException("이미 사용 중인 닉네임입니다.");
+                }
+            }
+        }
+        return userDAO.updateUserInfo(user) > 0;
+    }
+    @Override
+    public boolean updateProfilePW(UserVO user) {
+
+        user.setUserPwd(passwordEncoder.encode(user.getUserPwd()));
+
+        return userDAO.updateProfileUserPassword(user) > 0;
+    }
+
 }

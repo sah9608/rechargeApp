@@ -32,21 +32,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/login",
-                                "/api/user/signup",
-                                "/api/user/check-id",
-                                "/api/user/check-nickname",
-                                "/api/user/find-id",
-                                "/api/user/find-password",
-                                "/api/user/reset-password",
-                                "/api/user/send-email-auth",
-                                "/api/user/verify-email",
+                                "/api/user/**",
                                 "/api/station/**",
                                 "/api/charger/update",
                                 "/api/place/nearby",
                                 "/api/place/image",
                                 "/api/station/search",
                                 "/api/station/autocomplete",
-                                "/api/movie/**"
+                                "/api/movie/**",
+                                "/api/fortune/**"
                         ).permitAll()
 
                         .anyRequest().authenticated()

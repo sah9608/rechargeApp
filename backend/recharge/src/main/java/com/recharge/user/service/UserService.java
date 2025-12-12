@@ -14,4 +14,10 @@ public interface UserService {
     boolean resetPassword(UserVO user);
     boolean sendEmailAuthentication(UserVO user);
     boolean verifyEmail(UserVO user);
+
+    boolean updateUserInfo(UserVO user);
+    UserVO getUserById(String userId);
+
+    boolean updateProfilePW(UserVO user);
+
 }

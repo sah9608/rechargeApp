@@ -88,10 +88,13 @@ public class CommunityController {
 
     //게시글 상세 조회(조회수)
     @GetMapping("/post/{postId}")
-    public ResponseEntity<CommunityVO> getPostDetail(@PathVariable("postId") int postId) {
-        System.out.println("상세 조회 요청: ID=" + postId);
+    public ResponseEntity<CommunityVO> getPostDetail(
+                @PathVariable("postId") int postId,
+                @RequestParam(value="userId", required = false) String userId
+    ) {
+        System.out.println("상세 조회 요청: ID=" + postId+", UserId=" + userId);
 
-        CommunityVO post = communityService.readPost(postId);
+        CommunityVO post = communityService.readPost(postId, userId);
 
         if (post != null) {
             return ResponseEntity.ok(post);

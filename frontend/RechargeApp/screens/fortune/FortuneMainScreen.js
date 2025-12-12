@@ -7,11 +7,15 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
+  Platform,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SelectableButton from '../../components/common/SelectableButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Button from '../../components/common/Button';
+import {getFortune} from '../../utils/FortuneApi';
+import LoadingAnimation from '../../components/common/LoadingAnimation';
+import DatePicker from 'react-native-date-picker';
 
 export default function FortuneMainScreen({navigation}) {
   //라디오버튼 useState
@@ -20,7 +24,8 @@ export default function FortuneMainScreen({navigation}) {
   const [type, setType] = useState('saju');
 
   //Piker 관련 useState
-  const [birthDate, setBirthDate] = useState(null);
+  const [openBirthPicker, setOpenBirthPicker] = useState(false);
+  const [birthDate, setBirthDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [birthTime, setBirthTime] = useState(null);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -31,6 +36,8 @@ export default function FortuneMainScreen({navigation}) {
 
   //Detail 랜더링
   const [showDetail, setShowDetail] = useState(false);
+  const [fortuneResult, setFortuneResult] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const openDropdown = () => {
     dropdownRef.current.measure((fx, fy, width, height, px, py) => {
@@ -55,6 +62,8 @@ export default function FortuneMainScreen({navigation}) {
   const formatDate = date =>
     date ? date.toISOString().split('T')[0] : '연도-월-일';
 
+  const formattedResult = fortuneResult.replace(/\\n/g, '\n');
+
   //태어난 시 Piker 함수
   const timeOptions = [
     {label: '모름', value: 'dontknow'},
@@ -72,8 +81,64 @@ export default function FortuneMainScreen({navigation}) {
     {label: '해시 (21~23시)', value: '亥'},
   ];
 
+  const handleSubmit = async () => {
+    if (!gender || !calendarTypeSelector || !birthDate || !birthTime || !type) {
+      alert('모든 항목을 선택해주세요!');
+      return;
+    }
+
+    const payload = {
+      type:
+        type === 'saju'
+          ? 'saju'
+          : type === 'daily'
+          ? 'today'
+          : type === 'chinese'
+          ? 'zodiac'
+          : type === 'odiac'
+          ? 'star'
+          : '',
+
+      gender: gender === 'male' ? '남성' : '여성',
+
+      birth: birthDate.toISOString().split('T')[0],
+
+      birthTime:
+        birthTime?.value === 'dontknow' ? '모름' : birthTime?.label || '모름',
+
+      calendar:
+        calendarTypeSelector === 'Solar'
+          ? '양력'
+          : calendarTypeSelector === 'Lunar'
+          ? '음력'
+          : '',
+    };
+
+    console.log('📤 Fortune payload:', payload);
+
+    try {
+      setLoading(true);
+      setShowDetail(true);
+
+      const result = await getFortune(payload);
+      console.log('📥 Fortune result:', result);
+
+      setFortuneResult(result);
+      setShowDetail(true); // 디테일 열기
+    } catch (e) {
+      console.log('❌ 운세 조회 오류:', e);
+      alert('운세 생성 실패 😥');
+    } finally {
+      setLoading(false); // 🔥 항상 로딩 종료
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{paddingBottom: 40}}
+      nestedScrollEnabled={true}
+      showsVerticalScrollIndicator={false}>
       <View style={styles.pageHeader}>
         <View style={styles.headerTitleContainer}>
           <MaterialCommunityIcons
@@ -138,13 +203,17 @@ export default function FortuneMainScreen({navigation}) {
           {/* 생년월일 & 태어난 시 */}
           <View style={styles.secondRow}>
             {/* 생년월일 */}
+            {/* 생년월일 */}
             <View style={styles.birth}>
               <Text style={styles.birthText}>생년월일</Text>
+
               <Pressable
                 style={styles.birthWrapper}
-                onPress={() => setShowDatePicker(true)}>
+                onPress={() => setOpenBirthPicker(true)}>
                 <Text style={{color: '#111', fontSize: 13, fontWeight: '500'}}>
-                  {formatDate(birthDate)}
+                  {birthDate
+                    ? birthDate.toISOString().split('T')[0]
+                    : '연도-월-일'}
                 </Text>
                 <MaterialCommunityIcons
                   name="calendar"
@@ -153,14 +222,24 @@ export default function FortuneMainScreen({navigation}) {
                 />
               </Pressable>
 
-              {showDatePicker && (
-                <DateTimePicker
-                  value={birthDate || new Date()}
-                  mode="date"
-                  display="spinner"
-                  onChange={onChangeBirthDate}
-                />
-              )}
+              {/* 📌 생년월일 모달 DatePicker */}
+              <DatePicker
+                modal
+                open={openBirthPicker}
+                date={birthDate}
+                mode="date"
+                locale="ko"
+                title="생년월일 선택"
+                confirmText="확인"
+                cancelText="취소"
+                onConfirm={date => {
+                  setOpenBirthPicker(false);
+                  setBirthDate(date);
+                }}
+                onCancel={() => {
+                  setOpenBirthPicker(false);
+                }}
+              />
             </View>
 
             {/* 태어난 시 */}
@@ -222,32 +301,35 @@ export default function FortuneMainScreen({navigation}) {
           marginTop: 15,
           alignSelf: 'center',
         }}
-        onPress={() => setShowDetail(true)}
+        onPress={handleSubmit}
       />
       {/* 운세 디테일 영역
        */}
       {showDetail && (
         <View style={styles.detailCard}>
-          <Text style={styles.detailTitle}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <MaterialCommunityIcons
               name="star-four-points-outline"
               size={20}
               color="#004E89"
-              style={{marginRight: 500}}
+              style={{marginRight: 6}}
             />
-             운세 결과
-          </Text>
-          <Text style={styles.detailText}>성별: {gender || '-'}</Text>
-          <Text style={styles.detailText}>
-            양력/음력: {calendarTypeSelector || '-'}
-          </Text>
-          <Text style={styles.detailText}>
-            생년월일: {birthDate ? formatDate(birthDate) : '-'}
-          </Text>
-          <Text style={styles.detailText}>
-            태어난 시: {birthTime?.label || '-'}
-          </Text>
-          <Text style={styles.detailText}>운세 종류: {type}</Text>
+            <Text style={styles.detailTitle}>운세 결과</Text>
+          </View>
+
+          {/* 🔥 로딩 중일 때는 스피너 표시 */}
+          {loading ? (
+            <View style={{paddingVertical: 40}}>
+              <LoadingAnimation />
+            </View>
+          ) : (
+            <ScrollView
+              style={{maxHeight: 350, marginTop: 12}}
+              nestedScrollEnabled={true}
+              showsVerticalScrollIndicator={false}>
+              <Text style={styles.fortuneResultText}>{formattedResult}</Text>
+            </ScrollView>
+          )}
         </View>
       )}
 
@@ -293,7 +375,7 @@ export default function FortuneMainScreen({navigation}) {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -466,6 +548,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    // height를 강제해도 OK
+    // height: 420,
   },
   detailTitle: {
     fontSize: 18,
@@ -477,5 +561,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 6,
     color: '#444',
+  },
+  resultTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#004E89',
+    marginBottom: 6,
+  },
+
+  fortuneResultText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#333',
   },
 });

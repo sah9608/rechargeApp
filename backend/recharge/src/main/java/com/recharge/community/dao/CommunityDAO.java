@@ -17,7 +17,7 @@ public interface CommunityDAO {
     List<CommunityVO> selectPostList();
 
     int updateViewCount(int postId);
-    CommunityVO selectPostDetail(int postId);
+    CommunityVO selectPostDetail(@Param("postId") int postId, @Param("userId") String userId);
 
     int deletePost(int postId);
 

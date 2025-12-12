@@ -133,4 +133,22 @@ public class UserController {
         return ResponseEntity.ok("이메일 인증이 완료 되었습니다.");
     }
 
+    @GetMapping("/getUser")
+    public ResponseEntity<?> getUser(@RequestParam String userId) {
+        UserVO result = userService.getUserById(userId);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/modify")
+    public  ResponseEntity<?> modifyUser(@RequestBody UserVO user) {
+        boolean result =userService.updateUserInfo(user);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/profile-pw")
+    public ResponseEntity<?>profilePw(@RequestBody UserVO user) {
+        boolean result = userService.updateProfilePW(user);
+        return ResponseEntity.ok(result);
+    }
 }
+

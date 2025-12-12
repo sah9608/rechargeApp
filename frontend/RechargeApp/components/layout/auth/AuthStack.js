@@ -10,6 +10,7 @@ import FindIdResultScreen from '../../../screens/auth/FindIdResultScreen';
 import FindPwdResultScreen from '../../../screens/auth/FindPwdResultScreen';
 import ModifyPwdScreen from '../../../screens/auth/ModifyPwdScreen';
 import VerifyEmailScreen from '../../../screens/auth/VerifyEmailScreen';
+import ModifyProfileScreen from '../../../screens/auth/ModifyProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
